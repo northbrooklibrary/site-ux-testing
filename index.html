@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Northbrook Public Library — Patron UX Testing Toolkit</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --npl-green:  #2e7d32;
+    --npl-light:  #e8f5e9;
+    --npl-mid:    #a5d6a7;
+    --npl-dark:   #1b5e20;
+    --accent:     #f57f17;
+    --accent-lt:  #fff8e1;
+    --gray1:      #f5f5f5;
+    --gray2:      #e0e0e0;
+    --gray3:      #9e9e9e;
+    --gray4:      #616161;
+    --text:       #212121;
+    --shadow:     0 2px 8px rgba(0,0,0,.12);
+    --radius:     10px;
+    --export-blue: #1565c0;
+    --export-lt:   #e3f2fd;
+  }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fafafa; color: var(--text); min-height: 100vh; }
+  #app { display: flex; flex-direction: column; min-height: 100vh; }
+  header {
+    background: #1a5c1e;
+    color: #ffffff;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 4px solid #81c784;
+  }
+  header .logo { font-size: 1.55rem; font-weight: 800; letter-spacing: .01em; }
+  header .sub  { font-size: .88rem; color: #c8e6c9; margin-top: 2px; }
+  .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .session-badge { background: rgba(255,255,255,.18); border-radius: 20px; padding: 4px 14px; font-size: .8rem; }
+  nav {
+    background: #0a3d0f;
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 10px 18px;
+    border-bottom: 3px solid #81c784;
+  }
+  nav button {
+    background: rgba(255,255,255,.1);
+    border: 2px solid rgba(255,255,255,.25);
+    color: #ffffff;
+    padding: 10px 17px;
+    border-radius: 24px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .18s, border-color .18s, color .18s;
+    font-family: inherit;
+    letter-spacing: .01em;
+    min-height: 42px;
+  }
+  nav button:hover {
+    background: #81c784;
+    border-color: #81c784;
+    color: #0a3d0f;
+  }
+  nav button.active {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #0a3d0f;
+    font-weight: 800;
+  }
+  nav button:focus-visible {
+    outline: 3px solid #ffeb3b;
+    outline-offset: 2px;
+  }
+  main { flex: 1; padding: 20px 18px; max-width: 960px; margin: 0 auto; width: 100%; }
+  footer { background: #0a3d0f; color: #c8e6c9; text-align: center; font-size: .78rem; padding: 12px; font-weight: 500; }
+
+  /* Screens */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Batch header */
+  .batch-header { margin-bottom: 18px; }
+  .batch-num {
+    display: inline-block;
+    border-radius: 22px;
+    padding: 6px 18px;
+    font-size: .92rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    letter-spacing: .02em;
+  }
+  .batch-num.format { background: #0277bd; color: #ffffff; }
+  .batch-num.topic  { background: #6a1b9a; color: #ffffff; }
+  .batch-num.genre  { background: #c84b00; color: #ffffff; }
+  .batch-title { font-size: 1.3rem; font-weight: 700; color: var(--npl-dark); margin-bottom: 3px; }
+  .batch-desc  { font-size: .92rem; color: #3a3a3a; margin-bottom: 10px; }
+
+  /* Boxes */
+  .strategy-box { background: var(--accent-lt); border-left: 4px solid var(--accent); padding: 11px 14px; border-radius: 0 8px 8px 0; margin-bottom: 18px; font-size: .86rem; }
+  .strategy-box strong { color: #e65100; }
+  .facilitator-box { background: #e3f2fd; border-left: 4px solid #1565c0; border-radius: 0 8px 8px 0; padding: 11px 14px; font-size: .84rem; margin-bottom: 16px; }
+  .facilitator-box strong { color: #0d47a1; }
+
+  /* Q blocks */
+  .q-block { background: #fff; border: 1px solid var(--gray2); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 13px; box-shadow: var(--shadow); }
+  .q-label { font-weight: 700; margin-bottom: 10px; font-size: .93rem; }
+  .q-select-hint {
+    font-size: .82rem;
+    font-weight: 600;
+    color: #6a1b9a;
+    margin-left: 6px;
+    font-style: italic;
+  }
+  .q-sub   { color: #444444; font-size: .85rem; margin-bottom: 9px; }
+  .options-row { display: flex; flex-wrap: wrap; gap: 9px; }
+  .opt-btn { background: var(--gray1); border: 2px solid var(--gray2); border-radius: 8px; padding: 8px 14px; font-size: .88rem; cursor: pointer; transition: all .18s; font-family: inherit; }
+  .opt-btn:hover { border-color: var(--npl-mid); background: var(--npl-light); }
+  .opt-btn:focus-visible { outline: 3px solid #1565c0; outline-offset: 2px; }
+  .opt-btn.chosen { border-color: var(--npl-green); background: var(--npl-light); font-weight: 700; color: var(--npl-dark); }
+
+  /* Likert */
+  .likert-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .likert-label-lo, .likert-label-hi { font-size: .83rem; color: #2d2d2d; min-width: 80px; font-weight: 600; }
+  .likert-label-hi { text-align: right; }
+  .likert-btns { display: flex; gap: 6px; }
+  .likert-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--gray2); background: var(--gray1); font-size: .86rem; font-weight: 700; cursor: pointer; transition: all .18s; font-family: inherit; }
+  .likert-btn:hover { border-color: var(--npl-mid); }
+  .likert-btn:focus-visible { outline: 3px solid #1565c0; outline-offset: 2px; }
+  .likert-btn.chosen { border-color: var(--npl-green); background: var(--npl-green); color: #fff; }
+
+  /* Word association */
+  .assoc-block { background: #fff; border: 1px solid var(--gray2); border-radius: var(--radius); padding: 18px; margin-bottom: 13px; box-shadow: var(--shadow); }
+  .assoc-term { font-size: 1.4rem; font-weight: 800; color: var(--npl-dark); margin-bottom: 8px; }
+  .assoc-prompt { font-size: .88rem; color: #444444; margin-bottom: 10px; }
+  .tag-input-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 9px; }
+  .tag-input { flex: 1; min-width: 150px; padding: 7px 11px; border: 2px solid var(--gray2); border-radius: 7px; font-size: .88rem; font-family: inherit; }
+  .tag-input:focus { outline: none; border-color: var(--npl-green); }
+  .add-btn { background: var(--npl-green); color: #fff; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; font-size: .86rem; font-family: inherit; }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 7px; min-height: 38px; }
+  .cloud-tag { background: var(--npl-light); border: 1.5px solid var(--npl-mid); border-radius: 20px; padding: 4px 13px; font-size: .86rem; cursor: pointer; color: var(--npl-dark); font-weight: 600; }
+  .cloud-tag:hover { background: var(--npl-mid); }
+
+  /* Scenario card */
+  .scenario-card { background: #fff; border: 2px solid var(--npl-mid); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .scenario-icon { font-size: 1.8rem; margin-bottom: 7px; }
+  .scenario-text { font-size: .97rem; line-height: 1.6; }
+  .scenario-text em { color: var(--npl-dark); font-style: normal; font-weight: 700; }
+
+  /* Card sort */
+  .card-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+  .term-card { background: #fff; border: 2px solid var(--gray2); border-radius: var(--radius); padding: 14px 12px; text-align: center; font-size: .95rem; font-weight: 600; box-shadow: var(--shadow); cursor: grab; user-select: none; transition: border-color .18s, transform .12s; min-height: 58px; min-width: 110px; display: flex; align-items: center; justify-content: center; }
+  .term-card:hover { border-color: var(--npl-green); transform: translateY(-2px); }
+  .drop-area { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 12px; margin: 13px 0; }
+  .drop-zone { background: var(--gray1); border: 2px dashed var(--gray3); border-radius: var(--radius); min-height: 100px; padding: 11px; transition: border-color .18s, background .18s; }
+  .drop-zone.over { border-color: var(--npl-green); background: var(--npl-light); }
+  .drop-zone .zone-label { font-size: .8rem; font-weight: 800; color: #1a1a1a; margin-bottom: 7px; text-transform: uppercase; letter-spacing: .06em; }
+  .drop-zone .dropped-items { display: flex; flex-wrap: wrap; gap: 5px; }
+  .dropped-tag { background: var(--npl-green); color: #fff; border-radius: 20px; padding: 3px 11px; font-size: .8rem; cursor: pointer; }
+  .dropped-tag:hover { background: var(--npl-dark); }
+
+  /* Notes */
+  .notes-label { font-size: .83rem; color: #2d2d2d; margin-bottom: 3px; font-weight: 700; }
+  .notes-area { width: 100%; min-height: 72px; border: 2px solid var(--gray2); border-radius: 8px; padding: 9px; font-size: .86rem; font-family: inherit; resize: vertical; }
+  .notes-area:focus { outline: none; border-color: var(--npl-green); }
+
+  /* Patron meta bar */
+  .patron-meta { background: #fff; border: 1px solid var(--gray2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .patron-meta label { font-size: .86rem; font-weight: 700; color: #1a1a1a; display: flex; flex-direction: column; gap: 4px; }
+  .patron-meta input, .patron-meta select { padding: 6px 10px; border: 1.5px solid var(--gray2); border-radius: 7px; font-size: .86rem; font-family: inherit; min-width: 130px; }
+  .patron-meta input:focus, .patron-meta select:focus { outline: none; border-color: var(--npl-green); }
+
+  /* Action bar */
+  .action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--gray2); }
+  .btn-primary { background: var(--npl-green); color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: .9rem; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+  .btn-primary:hover { background: var(--npl-dark); }
+  .btn-export { background: var(--export-blue); color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: .9rem; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+  .btn-export:hover { background: #0d47a1; }
+  .btn-reset { background: #fff; color: #c62828; border: 2px solid #e57373; border-radius: 8px; padding: 9px 18px; font-size: .88rem; cursor: pointer; font-family: inherit; }
+  .btn-reset:hover { background: #ffebee; }
+
+  /* Summary panel */
+  .summary-panel { background: var(--npl-light); border: 1px solid var(--npl-mid); border-radius: var(--radius); padding: 14px; margin-top: 13px; font-size: .86rem; display: none; }
+  .summary-panel.visible { display: block; }
+  .summary-panel h4 { color: var(--npl-dark); margin-bottom: 8px; }
+  .summary-panel ul { padding-left: 17px; line-height: 1.85; }
+
+  /* Global export panel */
+  .export-panel { background: var(--export-lt); border: 2px solid #90caf9; border-radius: var(--radius); padding: 16px; margin-top: 14px; }
+  .export-panel h3 { color: var(--export-blue); margin-bottom: 10px; font-size: 1rem; }
+  .export-stats { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; }
+  .export-stat { text-align: center; }
+  .export-stat .num { font-size: 1.6rem; font-weight: 800; color: var(--export-blue); }
+  .export-stat .lbl { font-size: .76rem; color: var(--gray4); }
+
+  /* Overview cards */
+  .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 13px; margin-top: 18px; }
+  .overview-card { background: #fff; border: 1px solid var(--gray2); border-radius: var(--radius); padding: 15px; box-shadow: var(--shadow); cursor: pointer; transition: transform .14s, box-shadow .14s; }
+  .overview-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.13); }
+  .ov-num {
+    font-size: .78rem;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 3px 12px;
+    display: inline-block;
+    margin-bottom: 7px;
+  }
+  .ov-num.format { background: #0277bd; color: #ffffff; }
+  .ov-num.topic  { background: #6a1b9a; color: #ffffff; }
+  .ov-num.genre  { background: #c84b00; color: #ffffff; }
+  .ov-title  { font-weight: 700; font-size: .93rem; margin-bottom: 3px; }
+  .ov-terms  { font-size: .79rem; color: #3a3a3a; }
+  .ov-method { font-size: .79rem; color: #1b5e20; margin-top: 5px; font-style: italic; font-weight: 600; }
+  .ov-count  { font-size: .79rem; color: #0d47a1; margin-top: 5px; font-weight: 700; }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 24px; right: 24px; background: var(--npl-dark); color: #fff; padding: 11px 20px; border-radius: 8px; font-size: .9rem; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 9999; }
+  #toast.show { opacity: 1; }
+
+  /* ── GitHub config modal ────────────────────────────────────────── */
+  #gh-modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+  }
+  #gh-modal-backdrop.open { display: flex; }
+  #gh-modal {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 28px;
+    max-width: 520px;
+    width: 94%;
+    box-shadow: 0 8px 40px rgba(0,0,0,.28);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  #gh-modal h2 { color: #1b5e20; font-size: 1.2rem; margin-bottom: 8px; }
+  #gh-modal p  { font-size: .88rem; color: #444; margin-bottom: 18px; line-height: 1.6; }
+  #gh-modal label { display: block; font-size: .84rem; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; margin-top: 12px; }
+  #gh-modal input {
+    width: 100%; padding: 9px 12px; border: 2px solid #e0e0e0;
+    border-radius: 8px; font-size: .9rem; font-family: inherit;
+  }
+  #gh-modal input:focus { outline: none; border-color: #2e7d32; }
+  #gh-modal .modal-note {
+    background: #fff8e1; border-left: 4px solid #f57f17;
+    padding: 10px 13px; border-radius: 0 8px 8px 0;
+    font-size: .82rem; color: #5d4037; margin-top: 16px; line-height: 1.5;
+  }
+  #gh-modal .modal-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  #gh-modal .btn-save-gh {
+    background: #1b5e20; color: #fff; border: none;
+    border-radius: 8px; padding: 10px 22px; font-size: .92rem;
+    cursor: pointer; font-family: inherit; font-weight: 700;
+  }
+  #gh-modal .btn-save-gh:hover { background: #0a3d0f; }
+  #gh-modal .btn-cancel-gh {
+    background: #fff; color: #555; border: 2px solid #ccc;
+    border-radius: 8px; padding: 9px 18px; font-size: .9rem;
+    cursor: pointer; font-family: inherit;
+  }
+  #gh-modal .btn-cancel-gh:hover { border-color: #999; }
+  .gh-status-bar {
+    background: #e8f5e9; border: 1px solid #a5d6a7;
+    border-radius: 8px; padding: 8px 14px;
+    font-size: .82rem; color: #1b5e20; font-weight: 600;
+    display: none; margin-bottom: 10px;
+    align-items: center; gap: 8px;
+  }
+  .gh-status-bar.visible { display: flex; }
+  .gh-status-bar.error { background: #ffebee; border-color: #ef9a9a; color: #c62828; }
+  .gh-status-bar.pending { background: #fff8e1; border-color: #ffe082; color: #e65100; }
+  /* Settings gear in header */
+  .btn-settings {
+    background: rgba(255,255,255,.15);
+    border: 2px solid rgba(255,255,255,.3);
+    color: #fff; border-radius: 8px;
+    padding: 7px 13px; font-size: .85rem;
+    cursor: pointer; font-family: inherit;
+  }
+  .btn-settings:hover { background: rgba(255,255,255,.28); }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<header>
+  <div>
+    <div class="logo">📚 Northbrook Public Library</div>
+    <div class="sub">Patron UX Testing Toolkit · Taxonomy &amp; Navigation</div>
+  </div>
+  <div class="header-right">
+    <span class="session-badge" id="global-count">0 sessions recorded</span>
+    <button class="btn-settings" onclick="openGHModal()" title="Configure public data repo">⚙ Repo Settings</button>
+  </div>
+</header>
+
+<nav id="main-nav">
+  <button class="active" data-screen="home" onclick="showScreen('home')">🏠 Overview</button>
+  <button data-screen="b1" onclick="showScreen('b1')">Lot 1 · Kits</button>
+  <button data-screen="b2" onclick="showScreen('b2')">Lot 2 · Local Gov</button>
+  <button data-screen="b3" onclick="showScreen('b3')">Lot 3 · Audiobooks</button>
+  <button data-screen="b4" onclick="showScreen('b4')">Lot 4 · Video</button>
+  <button data-screen="b5" onclick="showScreen('b5')">Lot 5 · Biz &amp; Tech</button>
+  <button data-screen="b5b" onclick="showScreen('b5b')">Lot 5b · Self-Help</button>
+  <button data-screen="b6" onclick="showScreen('b6')">Lot 6 · Teen/YA</button>
+  <button data-screen="b7" onclick="showScreen('b7')">Lot 7 · Early Reading</button>
+  <button data-screen="b8" onclick="showScreen('b8')">Lot 8 · Digital</button>
+</nav>
+
+<main>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div id="home" class="screen active">
+  <div class="batch-header">
+    <div class="batch-title">Patron UX Testing — 8 Taxonomy Batches</div>
+    <div class="batch-desc">In-person facilitated sessions · Northbrook Public Library booth</div>
+  </div>
+
+
+  <div class="export-panel">
+    <h3>📊 Session Data Summary</h3>
+    <div class="export-stats">
+      <div class="export-stat"><div class="num" id="stat-total">0</div><div class="lbl">Total sessions</div></div>
+      <div class="export-stat"><div class="num" id="stat-b1">0</div><div class="lbl">Lot 1 · Kits</div></div>
+      <div class="export-stat"><div class="num" id="stat-b2">0</div><div class="lbl">Lot 2 · Local Gov</div></div>
+      <div class="export-stat"><div class="num" id="stat-b3">0</div><div class="lbl">Lot 3 · Audio</div></div>
+      <div class="export-stat"><div class="num" id="stat-b4">0</div><div class="lbl">Lot 4 · Video</div></div>
+      <div class="export-stat"><div class="num" id="stat-b5">0</div><div class="lbl">Lot 5 · Biz &amp; Tech</div></div>
+      <div class="export-stat"><div class="num" id="stat-b5b">0</div><div class="lbl">Lot 5b · Self-Help</div></div>
+      <div class="export-stat"><div class="num" id="stat-b6">0</div><div class="lbl">Lot 6 · Teen</div></div>
+      <div class="export-stat"><div class="num" id="stat-b7">0</div><div class="lbl">Lot 7 · Early</div></div>
+      <div class="export-stat"><div class="num" id="stat-b8">0</div><div class="lbl">Lot 8 · Digital</div></div>
+    </div>
+    <button class="btn-export" onclick="exportAllCSV()">⬇ Download All Sessions as CSV</button>
+  </div>
+
+  <div class="overview-grid">
+    <div class="overview-card" onclick="showScreen('b1')">
+      <span class="ov-num format">Lot 1 · Format</span>
+      <div class="ov-title">Kits</div>
+      <div class="ov-terms">What is a library "Kit"?</div>
+      <div class="ov-method">Scenario Task + Reaction</div>
+      <div class="ov-count" id="ov-b1">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b2')">
+      <span class="ov-num topic">Lot 2 · Topic</span>
+      <div class="ov-title">Local Gov &amp; Services</div>
+      <div class="ov-terms">Term association &amp; expectations</div>
+      <div class="ov-method">Word Association</div>
+      <div class="ov-count" id="ov-b2">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b3')">
+      <span class="ov-num format">Lot 3 · Format</span>
+      <div class="ov-title">Audiobooks</div>
+      <div class="ov-terms">eAudiobooks · Streaming</div>
+      <div class="ov-method">Scenario + Preference Ballot</div>
+      <div class="ov-count" id="ov-b3">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b4')">
+      <span class="ov-num format">Lot 4 · Format</span>
+      <div class="ov-title">Video Formats</div>
+      <div class="ov-terms">DVD · BluRay · Streaming</div>
+      <div class="ov-method">Card Sort → Grouping</div>
+      <div class="ov-count" id="ov-b4">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b5')">
+      <span class="ov-num topic">Lot 5 · Topic</span>
+      <div class="ov-title">Business &amp; Technology</div>
+      <div class="ov-terms">Scope · split vs. combined</div>
+      <div class="ov-method">Scope Reaction + Ranking</div>
+      <div class="ov-count" id="ov-b5">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b5b')">
+      <span class="ov-num topic">Lot 5b · Topic</span>
+      <div class="ov-title">Self-Help</div>
+      <div class="ov-terms">Self Help · PD &amp; Wellness · Mind &amp; Body</div>
+      <div class="ov-method">Scenario + Label Preference</div>
+      <div class="ov-count" id="ov-b5b">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b6')">
+      <span class="ov-num genre">Lot 6 · Genre</span>
+      <div class="ov-title">Teen / Young Adult</div>
+      <div class="ov-terms">Teen · Young Adult</div>
+      <div class="ov-method">Preference Ballot + Identity</div>
+      <div class="ov-count" id="ov-b6">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b7')">
+      <span class="ov-num format">Lot 7 · YS Format</span>
+      <div class="ov-title">Early Reading</div>
+      <div class="ov-terms">Easy Reader · Chapter Book</div>
+      <div class="ov-method">Age-Range Spectrum</div>
+      <div class="ov-count" id="ov-b7">0 sessions</div>
+    </div>
+    <div class="overview-card" onclick="showScreen('b8')">
+      <span class="ov-num format">Lot 8 · Format</span>
+      <div class="ov-title">Digital Resources</div>
+      <div class="ov-terms">11 competing labels</div>
+      <div class="ov-method">Open Card Sort + Naming</div>
+      <div class="ov-count" id="ov-b8">0 sessions</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 1: KITS ══════════════════════ -->
+<div id="b1" class="screen">
+  <div class="batch-header">
+    <span class="batch-num format">Lot 1 · Related Format</span>
+    <div class="batch-title">Kits</div>
+    <div class="batch-desc">Questions about the term "Kits" on the library website.</div>
+    
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b1-date" /></label>
+    
+    <label>Age group <select id="b1-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+    
+  </div>
+
+  <div class="scenario-card"><div class="scenario-text">You see a section on the library's website labeled <em>"Kits."</em></div></div>
+
+  <div class="q-block">
+    <div class="q-label">Q1 — What do you think you'd find in a section called "Kits"? <span class="q-select-hint">(Select all that apply)</span></div>
+    <div class="options-row" id="b1q1-opts">
+      <button class="opt-btn" onclick="toggleOpt(this)">Craft or activity supplies</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">A collection of items on a theme</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Books and materials together</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Something for children</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Not sure</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q2 — Would "Kits" make you want to explore that section?</div>
+    <div class="likert-row">
+      <span class="likert-label-lo">Definitely not</span>
+      <div class="likert-btns" id="b1q2-likert">
+        <button class="likert-btn" onclick="selectLikert(this,'b1q2')">1</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b1q2')">2</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b1q2')">3</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b1q2')">4</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b1q2')">5</button>
+      </div>
+      <span class="likert-label-hi">Definitely yes</span>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q3 — If you were looking for a themed bag of books &amp; activities for a toddler, which label would you click? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b1q3-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b1q3')">Kits</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b1q3')">Activity Bags</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b1q3')">Themed Collections</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b1q3')">Take-Home Kits</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b1q3')">Storytime Kits</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b1-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b1-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b1')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b1')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b1-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 2: LOCAL GOV ══════════════════════ -->
+<div id="b2" class="screen">
+  <div class="batch-header">
+    <span class="batch-num topic">Lot 2 · Topic</span>
+    <div class="batch-title">Local Government &amp; Services</div>
+    <div class="batch-desc">Questions about the "Local Government &amp; Services" topic label.</div>
+    
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b2-date" /></label>
+    
+    <label>Age group <select id="b2-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+    
+  </div>
+
+  <div class="assoc-block">
+    <div class="assoc-term">Local Government &amp; Services</div>
+    <div class="assoc-prompt">If you visited the library's "Local Government &amp; Services" web page, what words or topics would you expect to find? Type each one and press Add (or Enter).</div>
+    <div class="tag-input-row">
+      <input class="tag-input" id="b2-word-input" type="text" placeholder="e.g. mayor, permits, bus routes…" onkeydown="if(event.key==='Enter'){addTag('b2')}">
+      <button class="add-btn" onclick="addTag('b2')">Add</button>
+    </div>
+    <div class="tag-cloud" id="b2-cloud"></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q1 — Which do you expect under "Local Government &amp; Services"? (Select all that apply) <span class="q-select-hint">(Select all that apply)</span></div>
+    <div class="options-row" id="b2q1-opts">
+      <button class="opt-btn" onclick="toggleOpt(this)">Mayor / village board info</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Bus &amp; transit routes</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Voter registration &amp; elections</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Tax forms &amp; local fees</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Social services &amp; assistance</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Library services</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Community events &amp; recreation</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Building permits &amp; zoning</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q2 — Does "Local Government &amp; Services" feel right for that content? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b2q2-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b2q2')">Yes, fits well</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q2')">Somewhat — a bit vague</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q2')">No — I'd use a different name</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q2')">Not sure</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q3 — Preferred alternative label? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b2q3-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b2q3')">Local Government &amp; Services (keep)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q3')">Community Resources</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q3')">Civic Information</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q3')">Local Services &amp; Government</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q3')">Government &amp; Public Services</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b2q3')">Something else (see notes)</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b2-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b2-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b2')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b2')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b2-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 3: AUDIOBOOKS ══════════════════════ -->
+<div id="b3" class="screen">
+  <div class="batch-header">
+    <span class="batch-num format">Lot 3 · Related Format</span>
+    <div class="batch-title">Audiobooks — Digital Labels</div>
+    <div class="batch-desc">Questions about audiobook terminology on the website.</div>
+    
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b3-date" /></label>
+    
+    <label>Age group <select id="b3-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+    
+  </div>
+
+  <div class="scenario-card"><div class="scenario-icon">🎧</div><div class="scenario-text">You want to listen to a book on your phone while you're traveling. You go to the library website.</div></div>
+
+  <div class="q-block">
+    <div class="q-label">Q1 — What section label would you look for? <span class="q-select-hint">(Choose one)</span></div>
+    <textarea class="notes-area" id="b3-unprompted" placeholder="Patron's exact words…" style="min-height:46px"></textarea>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q2 — Which label is clearer?</div>
+    <div class="options-row" id="b3q2-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b3q2')">eAudiobooks</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q2')">Streaming Audiobooks</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q2')">Both equally clear</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q2')">Neither is clear</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q3 — Do these mean the same thing to you? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b3q3-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b3q3')">Yes — same thing</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q3')">No — they feel different</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q3')">Not sure</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q4 — If different, what's the distinction? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b3q4-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b3q4')">eAudiobooks = download; Streaming = play online only</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q4')">eAudiobooks = e-readers; Streaming = phones/speakers</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q4')">Streaming costs money; eAudiobooks are free</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q4')">Not sure what the difference would be</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q4')">N/A — answered "same"</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q5 — Preferred top-level grouping? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b3q5-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b3q5')">Both — listed separately</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q5')">Both — just call all "Audiobooks"</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q5')">Just one type is fine</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b3q5')">Not sure</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b3-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b3-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b3')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b3')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b3-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 4: VIDEO FORMATS ══════════════════════ -->
+<div id="b4" class="screen">
+  <div class="batch-header">
+    <span class="batch-num format">Lot 4 · Related Format</span>
+    <div class="batch-title">Video Format Labels</div>
+    <div class="batch-desc">Questions about movie and video format labels.</div>
+    
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b4-date" /></label>
+    
+    <label>Age group <select id="b4-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+    
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Step 1 — Card Sort: Drag terms into the group they belong to.</div>
+    <div class="card-grid" id="b4-source">
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'DVD')">DVD</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'BluRay')">BluRay</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'BluRay HD')">BluRay HD</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Blu-ray Disc')">Blu-ray Disc</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Streaming Video')">Streaming Video</div>
+    </div>
+    <div class="drop-area">
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b4-physical')" id="b4-physical">
+        <div class="zone-label">📀 Physical Discs</div>
+        <div class="dropped-items" id="items-b4-physical"></div>
+      </div>
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b4-digital')" id="b4-digital">
+        <div class="zone-label">📡 Digital / Online</div>
+        <div class="dropped-items" id="items-b4-digital"></div>
+      </div>
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b4-same')" id="b4-same">
+        <div class="zone-label">🔁 Same Thing</div>
+        <div class="dropped-items" id="items-b4-same"></div>
+      </div>
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b4-unsure')" id="b4-unsure">
+        <div class="zone-label">❓ Not Sure</div>
+        <div class="dropped-items" id="items-b4-unsure"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q2 — Best ONE label for physical discs on the website? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b4q2-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b4q2')">DVD</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q2')">BluRay</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q2')">BluRay HD</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q2')">Blu-ray Disc</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q2')">DVD &amp; Blu-ray (combined)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q2')">Movies &amp; TV</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q2')">Physical Media</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q3 — Should BluRay and BluRay HD be separate categories? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b4q3-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b4q3')">Yes — meaningfully different</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q3')">No — just "Blu-ray" is enough</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q3')">I don't know the difference</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b4q3')">I don't use physical discs</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b4-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b4-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b4')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b4')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b4-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 5: BUSINESS & TECHNOLOGY ══════════════════════ -->
+<div id="b5" class="screen">
+  <div class="batch-header">
+    <span class="batch-num topic">Lot 5 · Topic</span>
+    <div class="batch-title">Business &amp; Technology</div>
+    <div class="batch-desc">Questions about the "Business &amp; Technology" topic label.</div>
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b5-date" /></label>
+    <label>Age group <select id="b5-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q1 — Topics expected under "Business &amp; Technology"? <span class="q-select-hint">(Select all that apply)</span></div>
+    <div class="options-row" id="b5q1-opts">
+      <button class="opt-btn" onclick="toggleOpt(this)">Starting or running a business</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">How to use smartphones / computers</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Coding &amp; programming</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Job searching &amp; résumés</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Finance &amp; investing</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Social media / digital literacy</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Nonprofit management</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q2 — Is the scope of "Business &amp; Technology" clear to you?</div>
+    <div class="likert-row">
+      <span class="likert-label-lo">Very unclear</span>
+      <div class="likert-btns" id="b5q2-likert">
+        <button class="likert-btn" onclick="selectLikert(this,'b5q2')">1</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b5q2')">2</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b5q2')">3</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b5q2')">4</button>
+        <button class="likert-btn" onclick="selectLikert(this,'b5q2')">5</button>
+      </div>
+      <span class="likert-label-hi">Very clear</span>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q3 — Should "Business &amp; Technology" be split into two separate categories? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b5q3-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b5q3')">Yes — they're different enough to be separate</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5q3')">No — keep them together as one section</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5q3')">Business should be its own section; Technology belongs elsewhere</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5q3')">Technology should be its own section; Business belongs elsewhere</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5q3')">Not sure</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator.</div>
+    <textarea class="notes-area" id="b5-notes" placeholder="e.g. 'Patron laughed and said they had no idea…'"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b5-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b5')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b5')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b5-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 5b: SELF-HELP ══════════════════════ -->
+<div id="b5b" class="screen">
+  <div class="batch-header">
+    <span class="batch-num topic">Lot 5b · Topic</span>
+    <div class="batch-title">Self-Help / Personal Development &amp; Wellness</div>
+    <div class="batch-desc">Questions about Self Help, Personal Development, and Wellness terminology.</div>
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b5b-date" /></label>
+    <label>Age group <select id="b5b-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+  </div>
+
+  <div class="scenario-card"><div class="scenario-text">You're looking for books about managing anxiety, building healthy habits, or improving your relationships.</div></div>
+
+  <div class="q-block">
+    <div class="q-label">Q1 — Which label would you click to find those books? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b5bq1-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq1')">Self Help</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq1')">Personal Development &amp; Wellness</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq1')">Health &amp; Well-Being</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq1')">Mind &amp; Body</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq1')">I wouldn't know where to look</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q2 — Does "Self Help" feel welcoming and non-stigmatizing? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b5bq2-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq2')">Yes — familiar and fine</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq2')">OK but feels a little clinical</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq2')">No — feels stigmatizing</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b5bq2')">No strong opinion</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator.</div>
+    <textarea class="notes-area" id="b5b-notes" placeholder="e.g. 'Patron preferred Personal Development &amp; Wellness…'"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b5b-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b5b')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b5b')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b5b-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 6: TEEN / YA ══════════════════════ -->
+<div id="b6" class="screen">
+  <div class="batch-header">
+    <span class="batch-num genre">Lot 6 · Genre</span>
+    <div class="batch-title">Teen vs. Young Adult</div>
+    <div class="batch-desc">Questions about the "Teen" and "Young Adult" labels.</div>
+    
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b6-date" /></label>
+    
+    <label>Age group <select id="b6-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+    
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q1 — Unprompted: What section would you use to find books for a 15-year-old? <span class="q-select-hint">(Choose one)</span></div>
+    <textarea class="notes-area" id="b6-unprompted" placeholder="Patron's exact words before seeing the two terms…" style="min-height:46px"></textarea>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Q2 — Which label feels right for ages 13–18?</div>
+    <div class="options-row" id="b6q2-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b6q2')">Teen</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q2')">Young Adult</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q2')">Both work equally</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q2');toggleNeitherField(this)" id="b6q2-neither">Neither — I'd use a different word</button>
+    </div>
+    <div id="b6q2-other-wrap" style="margin-top:10px;display:none;">
+      <label style="font-size:.88rem;font-weight:700;color:#2d2d2d;display:block;margin-bottom:4px;">What word would you use instead?</label>
+      <input type="text" id="b6q2-other" class="tag-input" placeholder="Patron's suggested term…" style="width:100%;max-width:380px;" />
+    </div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Q3 — Do they mean the same age range to you? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b6q3-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b6q3')">Yes — exact same</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q3')">Mostly the same, slight overlap</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q3')">No — Young Adult includes college-age too</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q3')">No — Teen is younger than Young Adult</button>
+    </div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Q4 — Which label feels like it's meant for you? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b6q4-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b6q4')">Teen — that's what I am</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q4')">Young Adult — sounds more mature</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q4')">Neither really speaks to me</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q4')">I'm not a teen (skip)</button>
+    </div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Q5 — Use BOTH labels or just one? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b6q5-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b6q5')">Just one — less confusing</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q5')">Both — different people use different words</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b6q5')">One as label, other as search tag</button>
+    </div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b6-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b6-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b6')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b6')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b6-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 7: EARLY READING ══════════════════════ -->
+<div id="b7" class="screen">
+  <div class="batch-header">
+    <span class="batch-num format">Lot 7 · Related Format </span>
+    <div class="batch-title">Early Reading Level Labels</div>
+    <div class="batch-desc">Questions about early reader level labels.</div>
+    
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b7-date" /></label>
+    
+    <label>Age group <select id="b7-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+    <label>Child's age (if caregiver) <input type="text" id="b7-childage" placeholder="e.g. 7" style="width:80px" /></label>
+    
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q1 — What age/grade does "Easy Reader" bring to mind? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b7q1-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b7q1')">Ages 2–4 (Toddler / Pre-K)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q1')">Ages 4–6 (Pre-K / Kindergarten)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q1')">Ages 6–8 (Grades 1–2)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q1')">Ages 7–9 (Grades 2–3)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q1')">Ages 8–10 (Grades 3–4)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q1')">Not sure</button>
+    </div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Q2 — What age/grade does "Chapter Book" bring to mind? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b7q2-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b7q2')">Ages 4–6 (Pre-K / Kindergarten)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q2')">Ages 6–8 (Grades 1–2)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q2')">Ages 7–9 (Grades 2–3)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q2')">Ages 8–11 (Grades 3–5)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q2')">Ages 10–12 (Grades 5–6)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q2')">Not sure</button>
+    </div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Q3 — Which label is clearer for a parent searching for their child? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b7q3-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b7q3')">Easy Reader</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q3')">Chapter Book</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q3')">Both are clear</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q3')">Neither — I'd search by age/grade</button>
+    </div>
+  </div>
+  <div class="q-block">
+    <div class="q-label">Q4 — Preferred label for beginning readers? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b7q4-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b7q4')">Easy Reader (keep it)</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q4')">Beginning Readers</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q4')">Early Readers</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q4')">Level 1 / Level 2 Books</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b7q4')">I go by age range, not a label</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q5 — Age-Range Spectrum: Drag each label to the age bucket it belongs to.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;">
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Easy Reader')">Easy Reader</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Chapter Book')">Chapter Book</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Picture Book')">Picture Book</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Middle Grade')">Middle Grade</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <div class="drop-zone" style="min-width:95px;" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b7-age03')" id="b7-age03">
+        <div class="zone-label">0–3 yrs</div>
+        <div class="dropped-items" id="items-b7-age03"></div>
+      </div>
+      <div class="drop-zone" style="min-width:95px;" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b7-age45')" id="b7-age45">
+        <div class="zone-label">4–5 yrs</div>
+        <div class="dropped-items" id="items-b7-age45"></div>
+      </div>
+      <div class="drop-zone" style="min-width:95px;" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b7-age67')" id="b7-age67">
+        <div class="zone-label">6–7 yrs</div>
+        <div class="dropped-items" id="items-b7-age67"></div>
+      </div>
+      <div class="drop-zone" style="min-width:95px;" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b7-age810')" id="b7-age810">
+        <div class="zone-label">8–10 yrs</div>
+        <div class="dropped-items" id="items-b7-age810"></div>
+      </div>
+      <div class="drop-zone" style="min-width:95px;" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b7-age1113')" id="b7-age1113">
+        <div class="zone-label">11–13 yrs</div>
+        <div class="dropped-items" id="items-b7-age1113"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments</div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b7-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b7-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b7')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b7')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b7-summary"></div>
+</div>
+
+
+<!-- ══════════════════════ BATCH 8: DIGITAL RESOURCES ══════════════════════ -->
+<div id="b8" class="screen">
+  <div class="batch-header">
+    <span class="batch-num format">Lot 8 · Related Format</span>
+    <div class="batch-title">Digital Resources — Navigation Labels</div>
+    <div class="batch-desc">Questions about labels for online library resources.</div>
+    
+  </div>
+
+  <div class="patron-meta">
+    <label>Date <input type="date" id="b8-date" /></label>
+    
+    <label>Age group <select id="b8-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
+    
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Step 1 — Card Sort: Drag each term into the group it belongs to.</div>
+    <div class="card-grid">
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Online Resources')">Online Resources</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'eResources')">eResources</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Research')">Research</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Resources')">Resources</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Digital Library')">Digital Library</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Databases')">Databases</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Research Databases')">Research Databases</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Streaming Media')">Streaming Media</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Physical Media')">Physical Media</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Emagazine')">Emagazine</div>
+      <div class="term-card" draggable="true" ondragstart="dragStart(event,'Video Games')">Video Games</div>
+    </div>
+    <div class="drop-area" style="grid-template-columns:repeat(auto-fill,minmax(175px,1fr));">
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b8-online')" id="b8-online">
+        <div class="zone-label">🌐 Access online</div>
+        <div class="dropped-items" id="items-b8-online"></div>
+      </div>
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b8-research')" id="b8-research">
+        <div class="zone-label">🔬 For research / study</div>
+        <div class="dropped-items" id="items-b8-research"></div>
+      </div>
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b8-entertain')" id="b8-entertain">
+        <div class="zone-label">🎬 Entertainment / media</div>
+        <div class="dropped-items" id="items-b8-entertain"></div>
+      </div>
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b8-physical')" id="b8-physical">
+        <div class="zone-label">📦 Physical / in-library</div>
+        <div class="dropped-items" id="items-b8-physical"></div>
+      </div>
+      <div class="drop-zone" ondragover="allowDrop(event)" ondrop="dropTerm(event,'b8-unclear')" id="b8-unclear">
+        <div class="zone-label">❓ Unclear / not sure</div>
+        <div class="dropped-items" id="items-b8-unclear"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scenario-card"><div class="scenario-icon">🔍</div><div class="scenario-text">You want to find free online articles, encyclopedia entries, or news archives the library provides access to.</div></div>
+
+  <div class="q-block">
+    <div class="q-label">Q2 — Which ONE label would you click to find that content? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b8q2-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">Online Resources</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">eResources</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">Research</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">Databases</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">Research Databases</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">Digital Library</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">Resources</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q2')">I wouldn't know where to click</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q3 — Confusing or unclear terms?  <span class="q-select-hint">(Select all that apply)</span></div>
+    <div class="options-row" id="b8q3-opts">
+      <button class="opt-btn" onclick="toggleOpt(this)">eResources</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Research Databases</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Digital Library</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Streaming Media</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Physical Media</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">Emagazine</button>
+      <button class="opt-btn" onclick="toggleOpt(this)">None — all clear</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q4 — Should "Databases" and "Streaming Media" be in the same section or separate? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b8q4-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b8q4')">Same — both are "Digital Resources"</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q4')">Separate — Research ≠ Entertainment</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q4')">Not sure — depends on content</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Q5 — Best single top-level label for ALL digital/online library offerings? <span class="q-select-hint">(Choose one)</span></div>
+    <div class="options-row" id="b8q5-opts">
+      <button class="opt-btn" onclick="selectOpt(this,'b8q5')">Online Resources</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q5')">Digital Resources</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q5')">Digital Library</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q5')">eResources</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q5')">Research &amp; Digital Tools</button>
+      <button class="opt-btn" onclick="selectOpt(this,'b8q5')">Something else (see notes)</button>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Final Comments <span class="q-select-hint">(Select all that apply)</span></div>
+    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b8-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+  </div>
+
+  <div class="gh-status-bar" id="b8-gh-status"></div>
+  <div class="action-bar">
+    <button class="btn-primary" onclick="saveSession('b8')">💾 Save &amp; Export Session CSV</button>
+    <button class="btn-reset" onclick="resetBatch('b8')">↺ Reset for next patron</button>
+  </div>
+  <div class="summary-panel" id="b8-summary"></div>
+</div>
+
+</main>
+<footer>Northbrook Public Library · Patron UX Testing Toolkit · For in-person facilitated sessions · Not for distribution</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══ Navigation ══════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById(id);
+  if (screen) screen.classList.add('active');
+
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector('nav button[data-screen="' + id + '"]');
+  if (btn) btn.classList.add('active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══ Option selection ════════════════════════════════════════════
+function selectOpt(btn, group) {
+  document.querySelectorAll('#'+group+'-opts .opt-btn').forEach(b => b.classList.remove('chosen'));
+  btn.classList.add('chosen');
+}
+function toggleOpt(btn) { btn.classList.toggle('chosen'); }
+function selectLikert(btn, group) {
+  document.querySelectorAll('#'+group+'-likert .likert-btn').forEach(b => b.classList.remove('chosen'));
+  btn.classList.add('chosen');
+}
+
+// ══ Word association ════════════════════════════════════════════
+function addTag(batch) {
+  const input = document.getElementById(batch+'-word-input');
+  const val = input.value.trim();
+  if (!val) return;
+  const cloud = document.getElementById(batch+'-cloud');
+  const tag = document.createElement('span');
+  tag.className = 'cloud-tag';
+  tag.textContent = val;
+  tag.title = 'Click to remove';
+  tag.onclick = () => tag.remove();
+  cloud.appendChild(tag);
+  input.value = '';
+  input.focus();
+}
+
+// ══ Drag & drop ═════════════════════════════════════════════════
+let draggedTerm = '';
+function dragStart(e, term) { draggedTerm = term; e.dataTransfer.effectAllowed = 'move'; }
+function allowDrop(e) { e.preventDefault(); e.currentTarget.classList.add('over'); }
+document.addEventListener('dragleave', e => {
+  if (e.target.classList && e.target.classList.contains('drop-zone')) e.target.classList.remove('over');
+});
+function dropTerm(e, zoneId) {
+  e.preventDefault();
+  const zone = document.getElementById(zoneId);
+  zone.classList.remove('over');
+  if (!draggedTerm) return;
+  document.querySelectorAll('.dropped-tag').forEach(t => { if (t.dataset.term === draggedTerm) t.remove(); });
+  const items = document.getElementById('items-'+zoneId);
+  const tag = document.createElement('span');
+  tag.className = 'dropped-tag';
+  tag.dataset.term = draggedTerm;
+  tag.textContent = draggedTerm;
+  tag.title = 'Click to remove';
+  tag.onclick = () => tag.remove();
+  items.appendChild(tag);
+  draggedTerm = '';
+}
+
+// ══ In-memory session store ════════════════════════════════════
+// sessions[batch] = [ { ...row }, ... ]
+const sessions = { b1:[], b2:[], b3:[], b4:[], b5:[], b6:[], b7:[], b8:[] };
+
+// ══ Collect all responses for a batch into a flat object ═══════
+function collectResponses(batch) {
+  const row = {};
+  const now = new Date();
+
+  // Metadata
+  row['session_timestamp'] = now.toISOString();
+  row['batch'] = batch;
+  row['date']   = (document.getElementById(batch+'-date')  || {}).value || now.toISOString().slice(0,10);
+  row['age_group'] = (document.getElementById(batch+'-age') || {}).value || '';
+  if (batch === 'b7') row['child_age'] = (document.getElementById('b7-childage') || {}).value || '';
+
+  // Single-choice buttons
+  const singles = {
+    b1: ['b1q1','b1q2','b1q3'],
+    b2: ['b2q2','b2q3'],
+    b3: ['b3q2','b3q3','b3q4','b3q5'],
+    b4: ['b4q2','b4q3'],
+    b5: ['b5q2a','b5q3b','b5q4b'],
+    b6: ['b6q2','b6q3','b6q4','b6q5'],
+    b7: ['b7q1','b7q2','b7q3','b7q4'],
+    b8: ['b8q2','b8q4','b8q5']
+  };
+  (singles[batch] || []).forEach(qid => {
+    const chosen = document.querySelector('#'+qid+'-opts .opt-btn.chosen, #'+qid+'-likert .likert-btn.chosen');
+    row[qid] = chosen ? chosen.textContent.trim() : '';
+  });
+
+  // Multi-select
+  const multis = {
+    b2: ['b2q1'],
+    b5: ['b5q1a'],
+    b8: ['b8q3']
+  };
+  (multis[batch] || []).forEach(qid => {
+    const chosen = [];
+    document.querySelectorAll('#'+qid+'-opts .opt-btn.chosen').forEach(b => chosen.push(b.textContent.trim()));
+    row[qid] = chosen.join(' | ');
+  });
+
+  // Word cloud (b2)
+  if (batch === 'b2') {
+    const tags = [];
+    document.querySelectorAll('#b2-cloud .cloud-tag').forEach(t => tags.push(t.textContent.trim()));
+    row['b2_word_associations'] = tags.join(' | ');
+  }
+
+  // Card sort zones
+  const sortZones = {
+    b4: ['b4-physical','b4-digital','b4-same','b4-unsure'],
+    b7: ['b7-age03','b7-age45','b7-age67','b7-age810','b7-age1113'],
+    b8: ['b8-online','b8-research','b8-entertain','b8-physical','b8-unclear']
+  };
+  if (sortZones[batch]) {
+    sortZones[batch].forEach(zid => {
+      const items = [];
+      document.querySelectorAll('#items-'+zid+' .dropped-tag').forEach(t => items.push(t.textContent.trim()));
+      const label = (document.querySelector('#'+zid+' .zone-label') || {}).textContent || zid;
+      row['sort_'+zid] = items.join(' | ');
+    });
+  }
+
+  // Unprompted text areas
+  const unprompted = { b3: 'b3-unprompted', b6: 'b6-unprompted' };
+  if (unprompted[batch]) row[unprompted[batch]] = (document.getElementById(unprompted[batch]) || {}).value || '';
+
+  // Notes
+  row['facilitator_notes'] = (document.getElementById(batch+'-notes') || {}).value || '';
+
+  return row;
+}
+
+// ══ Save session + download CSV for this session ═══════════════
+async function saveSession(batch) {
+  const row = collectResponses(batch);
+  sessions[batch].push(row);
+  updateCounts();
+
+  const filename = 'NPL_UX_' + batch.toUpperCase() + '_' + (row['date'] || new Date().toISOString().slice(0,10)) + '_' + (row['patron'] || 'patron') + '.csv';
+  const csv = rowsToCSV([row]);
+
+  // Commit to GitHub if configured; only download locally as fallback
+  const statusEl = document.getElementById(batch + '-gh-status');
+  if (ghConfigured && statusEl) {
+    statusEl.textContent = '⏳ Submitting to GitHub…';
+    statusEl.className = 'gh-status-bar visible pending';
+
+    try {
+      const result = await commitCSVToGitHub(csv, filename, batch);
+      if (result.ok) {
+        // GitHub succeeded — no local download needed
+        statusEl.textContent = '✅ Saved to public data repo: ' + GH.owner + '/' + GH.dataRepo + '/' + GH.folder + '/' + filename;
+        statusEl.className = 'gh-status-bar visible';
+      } else if (result.reason === 'not_configured') {
+        // Shouldn't reach here if ghConfigured is true, but just in case
+        downloadCSV(csv, filename);
+        statusEl.textContent = '💾 CSV downloaded locally. Configure GitHub (⚙ header) to also submit online.';
+        statusEl.className = 'gh-status-bar visible pending';
+      } else {
+        // GitHub failed — fall back to local download
+        downloadCSV(csv, filename);
+        statusEl.textContent = '⚠ GitHub error (HTTP ' + result.status + '). CSV downloaded locally as backup.';
+        statusEl.className = 'gh-status-bar visible error';
+      }
+    } catch (err) {
+      // Network error — fall back to local download
+      downloadCSV(csv, filename);
+      statusEl.textContent = '⚠ GitHub error: ' + err.message + '. CSV saved locally as backup.';
+      statusEl.className = 'gh-status-bar visible error';
+    }
+  } else {
+    // GitHub not configured — always download locally
+    downloadCSV(csv, filename);
+    if (statusEl) {
+      statusEl.textContent = '💾 Saved locally. Tap ⚙ GitHub Setup in the header to also submit to your repo.';
+      statusEl.className = 'gh-status-bar visible pending';
+    }
+  }
+
+  // Show summary
+  const panel = document.getElementById(batch + '-summary');
+  panel.innerHTML = buildSummaryHTML(batch, row);
+  panel.classList.add('visible');
+
+  showToast(ghConfigured ? '✅ Session saved + committed to GitHub!' : '✅ Session saved locally!');
+}
+
+// ══ Export ALL sessions across all batches ═════════════════════
+function exportAllCSV() {
+  const allRows = [];
+  Object.values(sessions).forEach(arr => arr.forEach(r => allRows.push(r)));
+  if (allRows.length === 0) {
+    showToast('⚠ No sessions recorded yet.');
+    return;
+  }
+  const csv = rowsToCSV(allRows);
+  const today = new Date().toISOString().slice(0,10);
+  downloadCSV(csv, 'NPL_UX_All_Sessions_' + today + '.csv');
+  showToast('⬇ Exported ' + allRows.length + ' session(s) to CSV!');
+}
+
+// ══ CSV helpers ════════════════════════════════════════════════
+function rowsToCSV(rows) {
+  if (rows.length === 0) return '';
+  // Collect all keys in order
+  const keySet = new Set();
+  rows.forEach(r => Object.keys(r).forEach(k => keySet.add(k)));
+  const keys = Array.from(keySet);
+  const escape = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const header = keys.map(escape).join(',');
+  const body = rows.map(r => keys.map(k => escape(r[k] || '')).join(',')).join('\n');
+  return header + '\n' + body;
+}
+function downloadCSV(csvString, filename) {
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+// ══ Update session counts in UI ════════════════════════════════
+function updateCounts() {
+  let total = 0;
+  Object.entries(sessions).forEach(([b, arr]) => {
+    total += arr.length;
+    const stat = document.getElementById('stat-'+b);
+    if (stat) stat.textContent = arr.length;
+    const ov = document.getElementById('ov-'+b);
+    if (ov) ov.textContent = arr.length + ' session' + (arr.length !== 1 ? 's' : '');
+  });
+  const gc = document.getElementById('global-count');
+  if (gc) { const ghStr = ghConfigured ? ' · GitHub ✅' : ''; gc.textContent = total + ' session' + (total !== 1 ? 's' : '') + ' recorded' + ghStr; }
+  const st = document.getElementById('stat-total');
+  if (st) st.textContent = total;
+}
+
+// ══ Summary HTML ═══════════════════════════════════════════════
+function buildSummaryHTML(batch, row) {
+  let html = '<h4>✅ Session recorded · Patron ' + esc(row['patron'] || '—') + ' · ' + esc(row['date'] || '') + '</h4><ul>';
+  Object.entries(row).forEach(([k,v]) => {
+    if (v && k !== 'session_timestamp' && k !== 'batch') {
+      html += '<li><strong>' + esc(k.replace(/_/g,' ')) + ':</strong> ' + esc(v) + '</li>';
+    }
+  });
+  html += '</ul>';
+  return html;
+}
+
+// ══ Reset batch ════════════════════════════════════════════════
+function resetBatch(batch) {
+  if (!confirm('Reset all responses for this patron? (Saved sessions are not deleted.)')) return;
+  // Clear chosen buttons
+  document.querySelectorAll('#'+batch+' .opt-btn.chosen, #'+batch+' .likert-btn.chosen')
+    .forEach(b => b.classList.remove('chosen'));
+  // Clear textareas / inputs
+  document.querySelectorAll('#'+batch+' textarea, #'+batch+' .patron-meta input, #'+batch+' .patron-meta select')
+    .forEach(el => { el.value = ''; });
+  // Clear word cloud
+  const cloud = document.getElementById(batch+'-cloud');
+  if (cloud) cloud.innerHTML = '';
+  // Clear card sort zones
+  document.querySelectorAll('#'+batch+' .dropped-items').forEach(d => d.innerHTML = '');
+  // Hide summary
+  const panel = document.getElementById(batch+'-summary');
+  if (panel) { panel.classList.remove('visible'); panel.innerHTML = ''; }
+  showToast('↺ Ready for next patron');
+}
+
+// ══ Toast ══════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+
+// ══ GitHub config (in-memory only, cleared on page close) ════════════════
+let GH = { owner: '', dataRepo: '', folder: 'data', branch: 'main' };
+let ghConfigured = false;
+
+function openGHModal() {
+  document.getElementById('gh-owner').value     = GH.owner;
+  document.getElementById('gh-data-repo').value = GH.dataRepo;
+  document.getElementById('gh-folder').value    = GH.folder;
+  document.getElementById('gh-branch').value    = GH.branch;
+  document.getElementById('gh-modal-status').className = 'gh-status-bar';
+  document.getElementById('gh-modal-backdrop').classList.add('open');
+}
+function closeGHModal() {
+  document.getElementById('gh-modal-backdrop').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGHModal(); });
+document.getElementById('gh-modal-backdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('gh-modal-backdrop')) closeGHModal();
+});
+
+function saveGHConfig() {
+  GH.owner    = document.getElementById('gh-owner').value.trim();
+  GH.dataRepo = document.getElementById('gh-data-repo').value.trim();
+  GH.folder   = document.getElementById('gh-folder').value.trim() || 'data';
+  GH.branch   = document.getElementById('gh-branch').value.trim() || 'main';
+
+  if (!GH.owner || !GH.dataRepo) {
+    setModalStatus('error', '⚠ Please fill in username and data repo name.');
+    return;
+  }
+  setModalStatus('pending', '⏳ Testing public data repo…');
+
+  // Test by fetching the public DATA repo — no token needed
+  fetch(`https://api.github.com/repos/${GH.owner}/${GH.dataRepo}`, {
+    headers: {
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  })
+  .then(r => {
+    if (r.status === 200) {
+      ghConfigured = true;
+      setModalStatus('ok',
+        '✅ Connected! Sessions → ' + GH.owner + '/' + GH.dataRepo + '/' + GH.folder + '/ (public).'
+      );
+      updateGlobalBadge();
+      setTimeout(() => closeGHModal(), 2500);
+    } else if (r.status === 404) {
+      setModalStatus('error', '❌ Data repo not found (404). Check the repo name — and make sure it is set to Public in GitHub.');
+    } else {
+      setModalStatus('error', `❌ Unexpected error: HTTP ${r.status}`);
+    }
+  })
+  .catch(() => setModalStatus('error', '❌ Network error — check your connection.'));
+}
+
+function setModalStatus(type, msg) {
+  const el = document.getElementById('gh-modal-status');
+  el.textContent = msg;
+  el.className = 'gh-status-bar visible' + (type === 'error' ? ' error' : type === 'pending' ? ' pending' : '');
+}
+
+function updateGlobalBadge() {
+  const badge = document.getElementById('global-count');
+  if (!badge) return;
+  const total = Object.values(sessions).reduce((s,a) => s + a.length, 0);
+  const ghStr = ghConfigured ? ' · GitHub ✅' : '';
+  badge.textContent = total + ' session' + (total !== 1 ? 's' : '') + ' recorded' + ghStr;
+}
+
+// ══ Commit a CSV string to GitHub as a new file ═══════════════════════════
+async function commitCSVToGitHub(csvString, filename, batch) {
+  if (!ghConfigured) return { ok: false, reason: 'not_configured' };
+
+  const path = `${GH.folder}/${filename}`;
+  const url  = `https://api.github.com/repos/${GH.owner}/${GH.dataRepo}/contents/${path}`;
+  const content = btoa(unescape(encodeURIComponent(csvString)));
+
+  // Check if file already exists (need its SHA to overwrite)
+  let sha = undefined;
+  try {
+    const check = await fetch(url, {
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    });
+    if (check.ok) {
+      const existing = await check.json();
+      sha = existing.sha;
+    }
+  } catch (_) {}
+
+  const body = {
+    message: `UX session: ${filename}`,
+    content: content,
+    branch: GH.branch
+  };
+  if (sha) body.sha = sha;
+
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  return { ok: resp.ok, status: resp.status };
+}
+
+
+function toggleNeitherField(btn) {
+  var wrap = document.getElementById('b6q2-other-wrap');
+  if (!wrap) return;
+  if (btn && btn.classList.contains('selected')) {
+    wrap.style.display = 'block';
+    var inp = document.getElementById('b6q2-other');
+    if (inp) inp.focus();
+  } else {
+    wrap.style.display = 'none';
+    var inp2 = document.getElementById('b6q2-other');
+    if (inp2) inp2.value = '';
+  }
+}
+
+// Set today's date on all date fields
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().slice(0,10);
+  document.querySelectorAll('input[type=date]').forEach(el => { if (!el.value) el.value = today; });
+});
+</script>
+
+<!-- ═══ GitHub Configuration Modal ═══ -->
+<div id="gh-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="gh-modal-title">
+  <div id="gh-modal">
+    <h2 id="gh-modal-title">⚙️ Public Data Repo Settings</h2>
+    <p>Session CSVs are committed directly to a <strong>public</strong> GitHub repository. No password or token is needed — anyone can submit, and all responses are visible in that repo.</p>
+
+    <label for="gh-owner">GitHub username or organization</label>
+    <input id="gh-owner" type="text" placeholder="e.g. northbrooklibrary" autocomplete="off" spellcheck="false" />
+
+    <label for="gh-data-repo">Data repo name <span style="font-weight:400;color:#666">(public — receives all CSVs)</span></label>
+    <input id="gh-data-repo" type="text" placeholder="e.g. site-ux-data" autocomplete="off" spellcheck="false" />
+
+    <label for="gh-folder">Folder for data files</label>
+    <input id="gh-folder" type="text" placeholder="data" value="data" autocomplete="off" />
+
+    <label for="gh-branch">Branch</label>
+    <input id="gh-branch" type="text" placeholder="main" value="main" autocomplete="off" />
+
+    <div class="modal-note">
+      ℹ️ Because the data repo is public, submissions do not require a token. Make sure the repo is set to <strong>Public</strong> in GitHub, otherwise submissions will fail.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-save-gh" onclick="saveGHConfig()">Save &amp; Test Connection</button>
+      <button class="btn-cancel-gh" onclick="closeGHModal()">Cancel</button>
+    </div>
+    <div class="gh-status-bar" id="gh-modal-status"></div>
+  </div>
+</div>
+
+</body>
+</html>
