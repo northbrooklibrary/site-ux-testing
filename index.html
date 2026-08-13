@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Northbrook Public Library — Patron UX Testing Toolkit</title>
+<title>Northbrook Public Library — Participant UX Testing Toolkit</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -105,8 +105,8 @@
   /* Boxes */
   .strategy-box { background: var(--accent-lt); border-left: 4px solid var(--accent); padding: 11px 14px; border-radius: 0 8px 8px 0; margin-bottom: 18px; font-size: .86rem; }
   .strategy-box strong { color: #e65100; }
-  .facilitator-box { background: #e3f2fd; border-left: 4px solid #1565c0; border-radius: 0 8px 8px 0; padding: 11px 14px; font-size: .84rem; margin-bottom: 16px; }
-  .facilitator-box strong { color: #0d47a1; }
+  .researcher-box { background: #e3f2fd; border-left: 4px solid #1565c0; border-radius: 0 8px 8px 0; padding: 11px 14px; font-size: .84rem; margin-bottom: 16px; }
+  .researcher-box strong { color: #0d47a1; }
 
   /* Q blocks */
   .q-block { background: #fff; border: 1px solid var(--gray2); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 13px; box-shadow: var(--shadow); }
@@ -170,11 +170,11 @@
   .notes-area { width: 100%; min-height: 72px; border: 2px solid var(--gray2); border-radius: 8px; padding: 9px; font-size: .86rem; font-family: inherit; resize: vertical; }
   .notes-area:focus { outline: none; border-color: var(--npl-green); }
 
-  /* Patron meta bar */
-  .patron-meta { background: #fff; border: 1px solid var(--gray2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
-  .patron-meta label { font-size: .86rem; font-weight: 700; color: #1a1a1a; display: flex; flex-direction: column; gap: 4px; }
-  .patron-meta input, .patron-meta select { padding: 6px 10px; border: 1.5px solid var(--gray2); border-radius: 7px; font-size: .86rem; font-family: inherit; min-width: 130px; }
-  .patron-meta input:focus, .patron-meta select:focus { outline: none; border-color: var(--npl-green); }
+  /* Participant meta bar */
+  .participant-meta { background: #fff; border: 1px solid var(--gray2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .participant-meta label { font-size: .86rem; font-weight: 700; color: #1a1a1a; display: flex; flex-direction: column; gap: 4px; }
+  .participant-meta input, .participant-meta select { padding: 6px 10px; border: 1.5px solid var(--gray2); border-radius: 7px; font-size: .86rem; font-family: inherit; min-width: 130px; }
+  .participant-meta input:focus, .participant-meta select:focus { outline: none; border-color: var(--npl-green); }
 
   /* Action bar */
   .action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--gray2); }
@@ -222,52 +222,6 @@
   /* Toast */
   #toast { position: fixed; bottom: 24px; right: 24px; background: var(--npl-dark); color: #fff; padding: 11px 20px; border-radius: 8px; font-size: .9rem; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 9999; }
   #toast.show { opacity: 1; }
-
-  /* ── GitHub config modal ────────────────────────────────────────── */
-  #gh-modal-backdrop {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.55);
-    z-index: 10000;
-    align-items: center;
-    justify-content: center;
-  }
-  #gh-modal-backdrop.open { display: flex; }
-  #gh-modal {
-    background: #fff;
-    border-radius: 14px;
-    padding: 32px 28px;
-    max-width: 520px;
-    width: 94%;
-    box-shadow: 0 8px 40px rgba(0,0,0,.28);
-    font-family: 'Segoe UI', Arial, sans-serif;
-  }
-  #gh-modal h2 { color: #1b5e20; font-size: 1.2rem; margin-bottom: 8px; }
-  #gh-modal p  { font-size: .88rem; color: #444; margin-bottom: 18px; line-height: 1.6; }
-  #gh-modal label { display: block; font-size: .84rem; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; margin-top: 12px; }
-  #gh-modal input {
-    width: 100%; padding: 9px 12px; border: 2px solid #e0e0e0;
-    border-radius: 8px; font-size: .9rem; font-family: inherit;
-  }
-  #gh-modal input:focus { outline: none; border-color: #2e7d32; }
-  #gh-modal .modal-note {
-    background: #fff8e1; border-left: 4px solid #f57f17;
-    padding: 10px 13px; border-radius: 0 8px 8px 0;
-    font-size: .82rem; color: #5d4037; margin-top: 16px; line-height: 1.5;
-  }
-  #gh-modal .modal-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
-  #gh-modal .btn-save-gh {
-    background: #1b5e20; color: #fff; border: none;
-    border-radius: 8px; padding: 10px 22px; font-size: .92rem;
-    cursor: pointer; font-family: inherit; font-weight: 700;
-  }
-  #gh-modal .btn-save-gh:hover { background: #0a3d0f; }
-  #gh-modal .btn-cancel-gh {
-    background: #fff; color: #555; border: 2px solid #ccc;
-    border-radius: 8px; padding: 9px 18px; font-size: .9rem;
-    cursor: pointer; font-family: inherit;
-  }
-  #gh-modal .btn-cancel-gh:hover { border-color: #999; }
   .gh-status-bar {
     background: #e8f5e9; border: 1px solid #a5d6a7;
     border-radius: 8px; padding: 8px 14px;
@@ -296,12 +250,10 @@
 <header>
   <div>
     <div class="logo">📚 Northbrook Public Library</div>
-    <div class="sub">Patron UX Testing Toolkit · Taxonomy &amp; Navigation</div>
+    <div class="sub">Participant UX Testing Toolkit · Taxonomy &amp; Navigation</div>
   </div>
   <div class="header-right">
-    <span class="session-badge" id="global-count">0 sessions recorded</span>
-    <button class="btn-settings" onclick="openGHModal()" title="Configure public data repo">⚙ Repo Settings</button>
-  </div>
+    <span class="session-badge" id="global-count">0 sessions recorded</span></div>
 </header>
 
 <nav id="main-nav">
@@ -322,8 +274,8 @@
 <!-- ═══════════ HOME ═══════════ -->
 <div id="home" class="screen active">
   <div class="batch-header">
-    <div class="batch-title">Patron UX Testing — 8 Taxonomy Batches</div>
-    <div class="batch-desc">In-person facilitated sessions · Northbrook Public Library booth</div>
+    <div class="batch-title">Participant UX Testing — 8 Taxonomy Batches</div>
+    <div class="batch-desc">Self-guided online survey · Northbrook Public Library survey</div>
   </div>
 
 
@@ -341,7 +293,6 @@
       <div class="export-stat"><div class="num" id="stat-b7">0</div><div class="lbl">Lot 7 · Early</div></div>
       <div class="export-stat"><div class="num" id="stat-b8">0</div><div class="lbl">Lot 8 · Digital</div></div>
     </div>
-    <button class="btn-export" onclick="exportAllCSV()">⬇ Download All Sessions as CSV</button>
   </div>
 
   <div class="overview-grid">
@@ -421,14 +372,14 @@
     
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b1-date" /></label>
     
     <label>Age group <select id="b1-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
     
   </div>
 
-  <div class="scenario-card"><div class="scenario-text">You see a section on the library's website labeled <em>"Kits."</em></div></div>
+  <div class="scenario-card"><div class="scenario-text">You see a section labeled <em>"Kits."</em></div></div>
 
   <div class="q-block">
     <div class="q-label">Q1 — What do you think you'd find in a section called "Kits"? <span class="q-select-hint">(Select all that apply)</span></div>
@@ -468,15 +419,15 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b1-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b1-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b1-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b1')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b1')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b1')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b1')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b1-summary"></div>
 </div>
@@ -491,7 +442,7 @@
     
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b2-date" /></label>
     
     <label>Age group <select id="b2-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
@@ -545,15 +496,15 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b2-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b2-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b2-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b2')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b2')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b2')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b2')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b2-summary"></div>
 </div>
@@ -568,7 +519,7 @@
     
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b3-date" /></label>
     
     <label>Age group <select id="b3-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
@@ -579,7 +530,7 @@
 
   <div class="q-block">
     <div class="q-label">Q1 — What section label would you look for? <span class="q-select-hint">(Choose one)</span></div>
-    <textarea class="notes-area" id="b3-unprompted" placeholder="Patron's exact words…" style="min-height:46px"></textarea>
+    <textarea class="notes-area" id="b3-unprompted" placeholder="Participant's exact words…" style="min-height:46px"></textarea>
   </div>
 
   <div class="q-block">
@@ -623,15 +574,15 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b3-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b3-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b3-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b3')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b3')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b3')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b3')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b3-summary"></div>
 </div>
@@ -646,7 +597,7 @@
     
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b4-date" /></label>
     
     <label>Age group <select id="b4-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
@@ -706,15 +657,15 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b4-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b4-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b4-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b4')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b4')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b4')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b4')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b4-summary"></div>
 </div>
@@ -728,7 +679,7 @@
     <div class="batch-desc">Questions about the "Business &amp; Technology" topic label.</div>
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b5-date" /></label>
     <label>Age group <select id="b5-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
   </div>
@@ -773,15 +724,15 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator.</div>
-    <textarea class="notes-area" id="b5-notes" placeholder="e.g. 'Patron laughed and said they had no idea…'"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback.</div>
+    <textarea class="notes-area" id="b5-notes" placeholder="e.g. 'Participant laughed and said they had no idea…'"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b5-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b5')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b5')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b5')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b5')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b5-summary"></div>
 </div>
@@ -795,7 +746,7 @@
     <div class="batch-desc">Questions about Self Help, Personal Development, and Wellness terminology.</div>
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b5b-date" /></label>
     <label>Age group <select id="b5b-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
   </div>
@@ -824,15 +775,15 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator.</div>
-    <textarea class="notes-area" id="b5b-notes" placeholder="e.g. 'Patron preferred Personal Development &amp; Wellness…'"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback.</div>
+    <textarea class="notes-area" id="b5b-notes" placeholder="e.g. 'Participant preferred Personal Development &amp; Wellness…'"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b5b-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b5b')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b5b')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b5b')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b5b')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b5b-summary"></div>
 </div>
@@ -847,7 +798,7 @@
     
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b6-date" /></label>
     
     <label>Age group <select id="b6-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
@@ -856,7 +807,7 @@
 
   <div class="q-block">
     <div class="q-label">Q1 — Unprompted: What section would you use to find books for a 15-year-old? <span class="q-select-hint">(Choose one)</span></div>
-    <textarea class="notes-area" id="b6-unprompted" placeholder="Patron's exact words before seeing the two terms…" style="min-height:46px"></textarea>
+    <textarea class="notes-area" id="b6-unprompted" placeholder="Participant's exact words before seeing the two terms…" style="min-height:46px"></textarea>
   </div>
   <div class="q-block">
     <div class="q-label">Q2 — Which label feels right for ages 13–18?</div>
@@ -868,7 +819,7 @@
     </div>
     <div id="b6q2-other-wrap" style="margin-top:10px;display:none;">
       <label style="font-size:.88rem;font-weight:700;color:#2d2d2d;display:block;margin-bottom:4px;">What word would you use instead?</label>
-      <input type="text" id="b6q2-other" class="tag-input" placeholder="Patron's suggested term…" style="width:100%;max-width:380px;" />
+      <input type="text" id="b6q2-other" class="tag-input" placeholder="Participant's suggested term…" style="width:100%;max-width:380px;" />
     </div>
   </div>
   <div class="q-block">
@@ -898,15 +849,15 @@
     </div>
   </div>
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b6-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b6-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b6-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b6')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b6')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b6')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b6')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b6-summary"></div>
 </div>
@@ -921,7 +872,7 @@
     
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b7-date" /></label>
     
     <label>Age group <select id="b7-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
@@ -1004,15 +955,15 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments</div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b7-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+    <div class="q-label">Any other thoughts?</div>
+    <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b7-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b7-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b7')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b7')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b7')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b7')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b7-summary"></div>
 </div>
@@ -1027,7 +978,7 @@
     
   </div>
 
-  <div class="patron-meta">
+  <div class="participant-meta">
     <label>Date <input type="date" id="b8-date" /></label>
     
     <label>Age group <select id="b8-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
@@ -1124,21 +1075,21 @@
   </div>
 
   <div class="q-block">
-    <div class="q-label">Final Comments <span class="q-select-hint">(Select all that apply)</span></div>
-    <div class="q-sub">Observations from the patron, caretaker, or facilitator — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b8-notes" placeholder="e.g. 'Patron laughed and said they had no idea…' or 'Caretaker disagreed with their child's answer'…"></textarea>
+    <div class="q-label">Any other thoughts? <span class="q-select-hint">(Select all that apply)</span></div>
+    <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
+    <textarea class="notes-area" id="b8-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b8-gh-status"></div>
   <div class="action-bar">
-    <button class="btn-primary" onclick="saveSession('b8')">💾 Save &amp; Export Session CSV</button>
-    <button class="btn-reset" onclick="resetBatch('b8')">↺ Reset for next patron</button>
+    <button class="btn-primary" onclick="saveSession('b8')">📤 Submit Session</button>
+    <button class="btn-reset" onclick="resetBatch('b8')">↺ Reset for next participant</button>
   </div>
   <div class="summary-panel" id="b8-summary"></div>
 </div>
 
 </main>
-<footer>Northbrook Public Library · Patron UX Testing Toolkit · For in-person facilitated sessions · Not for distribution</footer>
+<footer>Northbrook Public Library · Participant UX Testing Toolkit · For in-person facilitated sessions · For research use only</footer>
 </div>
 
 <div id="toast"></div>
@@ -1279,7 +1230,7 @@ function collectResponses(batch) {
   if (unprompted[batch]) row[unprompted[batch]] = (document.getElementById(unprompted[batch]) || {}).value || '';
 
   // Notes
-  row['facilitator_notes'] = (document.getElementById(batch+'-notes') || {}).value || '';
+  row['researcher_notes'] = (document.getElementById(batch+'-notes') || {}).value || '';
 
   return row;
 }
@@ -1290,7 +1241,7 @@ async function saveSession(batch) {
   sessions[batch].push(row);
   updateCounts();
 
-  const filename = 'NPL_UX_' + batch.toUpperCase() + '_' + (row['date'] || new Date().toISOString().slice(0,10)) + '_' + (row['patron'] || 'patron') + '.csv';
+  const filename = 'NPL_UX_' + batch.toUpperCase() + '_' + (row['date'] || new Date().toISOString().slice(0,10)) + '_' + (row['participant'] || 'participant') + '.csv';
   const csv = rowsToCSV([row]);
 
   // Commit to GitHub if configured; only download locally as fallback
@@ -1307,26 +1258,22 @@ async function saveSession(batch) {
         statusEl.className = 'gh-status-bar visible';
       } else if (result.reason === 'not_configured') {
         // Shouldn't reach here if ghConfigured is true, but just in case
-        downloadCSV(csv, filename);
-        statusEl.textContent = '💾 CSV downloaded locally. Configure GitHub (⚙ header) to also submit online.';
+              statusEl.textContent = '💾 CSV downloaded locally. GitHub submission is not configured.';
         statusEl.className = 'gh-status-bar visible pending';
       } else {
         // GitHub failed — fall back to local download
-        downloadCSV(csv, filename);
-        statusEl.textContent = '⚠ GitHub error (HTTP ' + result.status + '). CSV downloaded locally as backup.';
+              statusEl.textContent = '⚠ GitHub error (HTTP ' + result.status + '). CSV downloaded locally as backup.';
         statusEl.className = 'gh-status-bar visible error';
       }
     } catch (err) {
       // Network error — fall back to local download
-      downloadCSV(csv, filename);
-      statusEl.textContent = '⚠ GitHub error: ' + err.message + '. CSV saved locally as backup.';
+          statusEl.textContent = '⚠ GitHub error: ' + err.message + '. CSV saved locally as backup.';
       statusEl.className = 'gh-status-bar visible error';
     }
   } else {
     // GitHub not configured — always download locally
-    downloadCSV(csv, filename);
-    if (statusEl) {
-      statusEl.textContent = '💾 Saved locally. Tap ⚙ GitHub Setup in the header to also submit to your repo.';
+      if (statusEl) {
+      statusEl.textContent = '⏳ Submitting to GitHub…';
       statusEl.className = 'gh-status-bar visible pending';
     }
   }
@@ -1395,7 +1342,7 @@ function updateCounts() {
 
 // ══ Summary HTML ═══════════════════════════════════════════════
 function buildSummaryHTML(batch, row) {
-  let html = '<h4>✅ Session recorded · Patron ' + esc(row['patron'] || '—') + ' · ' + esc(row['date'] || '') + '</h4><ul>';
+  let html = '<h4>✅ Session recorded · Participant ' + esc(row['participant'] || '—') + ' · ' + esc(row['date'] || '') + '</h4><ul>';
   Object.entries(row).forEach(([k,v]) => {
     if (v && k !== 'session_timestamp' && k !== 'batch') {
       html += '<li><strong>' + esc(k.replace(/_/g,' ')) + ':</strong> ' + esc(v) + '</li>';
@@ -1407,12 +1354,12 @@ function buildSummaryHTML(batch, row) {
 
 // ══ Reset batch ════════════════════════════════════════════════
 function resetBatch(batch) {
-  if (!confirm('Reset all responses for this patron? (Saved sessions are not deleted.)')) return;
+  if (!confirm('Reset all responses for this participant? (Saved sessions are not deleted.)')) return;
   // Clear chosen buttons
   document.querySelectorAll('#'+batch+' .opt-btn.chosen, #'+batch+' .likert-btn.chosen')
     .forEach(b => b.classList.remove('chosen'));
   // Clear textareas / inputs
-  document.querySelectorAll('#'+batch+' textarea, #'+batch+' .patron-meta input, #'+batch+' .patron-meta select')
+  document.querySelectorAll('#'+batch+' textarea, #'+batch+' .participant-meta input, #'+batch+' .participant-meta select')
     .forEach(el => { el.value = ''; });
   // Clear word cloud
   const cloud = document.getElementById(batch+'-cloud');
@@ -1422,7 +1369,7 @@ function resetBatch(batch) {
   // Hide summary
   const panel = document.getElementById(batch+'-summary');
   if (panel) { panel.classList.remove('visible'); panel.innerHTML = ''; }
-  showToast('↺ Ready for next patron');
+  showToast('↺ Ready for next participant');
 }
 
 // ══ Toast ══════════════════════════════════════════════════════
@@ -1438,66 +1385,10 @@ function esc(s) {
 
 
 // ══ GitHub config (in-memory only, cleared on page close) ════════════════
-let GH = { owner: '', dataRepo: '', folder: 'data', branch: 'main' };
-let ghConfigured = false;
+let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main' };
+let ghConfigured = true;
 
-function openGHModal() {
-  document.getElementById('gh-owner').value     = GH.owner;
-  document.getElementById('gh-data-repo').value = GH.dataRepo;
-  document.getElementById('gh-folder').value    = GH.folder;
-  document.getElementById('gh-branch').value    = GH.branch;
-  document.getElementById('gh-modal-status').className = 'gh-status-bar';
-  document.getElementById('gh-modal-backdrop').classList.add('open');
-}
-function closeGHModal() {
-  document.getElementById('gh-modal-backdrop').classList.remove('open');
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGHModal(); });
-document.getElementById('gh-modal-backdrop').addEventListener('click', e => {
-  if (e.target === document.getElementById('gh-modal-backdrop')) closeGHModal();
-});
 
-function saveGHConfig() {
-  GH.owner    = document.getElementById('gh-owner').value.trim();
-  GH.dataRepo = document.getElementById('gh-data-repo').value.trim();
-  GH.folder   = document.getElementById('gh-folder').value.trim() || 'data';
-  GH.branch   = document.getElementById('gh-branch').value.trim() || 'main';
-
-  if (!GH.owner || !GH.dataRepo) {
-    setModalStatus('error', '⚠ Please fill in username and data repo name.');
-    return;
-  }
-  setModalStatus('pending', '⏳ Testing public data repo…');
-
-  // Test by fetching the public DATA repo — no token needed
-  fetch(`https://api.github.com/repos/${GH.owner}/${GH.dataRepo}`, {
-    headers: {
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28'
-    }
-  })
-  .then(r => {
-    if (r.status === 200) {
-      ghConfigured = true;
-      setModalStatus('ok',
-        '✅ Connected! Sessions → ' + GH.owner + '/' + GH.dataRepo + '/' + GH.folder + '/ (public).'
-      );
-      updateGlobalBadge();
-      setTimeout(() => closeGHModal(), 2500);
-    } else if (r.status === 404) {
-      setModalStatus('error', '❌ Data repo not found (404). Check the repo name — and make sure it is set to Public in GitHub.');
-    } else {
-      setModalStatus('error', `❌ Unexpected error: HTTP ${r.status}`);
-    }
-  })
-  .catch(() => setModalStatus('error', '❌ Network error — check your connection.'));
-}
-
-function setModalStatus(type, msg) {
-  const el = document.getElementById('gh-modal-status');
-  el.textContent = msg;
-  el.className = 'gh-status-bar visible' + (type === 'error' ? ' error' : type === 'pending' ? ' pending' : '');
-}
 
 function updateGlobalBadge() {
   const badge = document.getElementById('global-count');
@@ -1571,36 +1462,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('input[type=date]').forEach(el => { if (!el.value) el.value = today; });
 });
 </script>
-
-<!-- ═══ GitHub Configuration Modal ═══ -->
-<div id="gh-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="gh-modal-title">
-  <div id="gh-modal">
-    <h2 id="gh-modal-title">⚙️ Public Data Repo Settings</h2>
-    <p>Session CSVs are committed directly to a <strong>public</strong> GitHub repository. No password or token is needed — anyone can submit, and all responses are visible in that repo.</p>
-
-    <label for="gh-owner">GitHub username or organization</label>
-    <input id="gh-owner" type="text" placeholder="e.g. northbrooklibrary" autocomplete="off" spellcheck="false" />
-
-    <label for="gh-data-repo">Data repo name <span style="font-weight:400;color:#666">(public — receives all CSVs)</span></label>
-    <input id="gh-data-repo" type="text" placeholder="e.g. site-ux-data" autocomplete="off" spellcheck="false" />
-
-    <label for="gh-folder">Folder for data files</label>
-    <input id="gh-folder" type="text" placeholder="data" value="data" autocomplete="off" />
-
-    <label for="gh-branch">Branch</label>
-    <input id="gh-branch" type="text" placeholder="main" value="main" autocomplete="off" />
-
-    <div class="modal-note">
-      ℹ️ Because the data repo is public, submissions do not require a token. Make sure the repo is set to <strong>Public</strong> in GitHub, otherwise submissions will fail.
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-save-gh" onclick="saveGHConfig()">Save &amp; Test Connection</button>
-      <button class="btn-cancel-gh" onclick="closeGHModal()">Cancel</button>
-    </div>
-    <div class="gh-status-bar" id="gh-modal-status"></div>
-  </div>
-</div>
 
 </body>
 </html>
