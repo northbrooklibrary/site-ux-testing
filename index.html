@@ -1380,8 +1380,15 @@ function esc(s) {
 }
 
 
-// ══ GitHub config (in-memory only, cleared on page close) ════════════════
-let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main', token: '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' };
+// ══ Worker config ══════════════════════════════════════════════
+// No GitHub token lives here anymore. The browser only ever talks to the
+// Cloudflare Worker below; the Worker holds the GitHub App credentials and
+// does the actual repository_dispatch call server-side.
+//
+// >>> Replace this with your deployed Worker's URL (see worker.js). <<<
+const WORKER_URL = 'https://ux-dispatch.YOUR-SUBDOMAIN.workers.dev/submit';
+
+let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main' };
 let ghConfigured = true;
 
 
@@ -1394,32 +1401,32 @@ function updateGlobalBadge() {
   badge.textContent = total + ' session' + (total !== 1 ? 's' : '') + ' recorded' + ghStr;
 }
 
-// ══ Trigger repository_dispatch workflow to commit CSV ═══════════════════
+// ══ Send session to the Cloudflare Worker, which relays it to GitHub ═════
+// The Worker holds the GitHub App ID + private key and does the JWT →
+// installation-token → repository_dispatch dance server-side. The browser
+// never sees a GitHub credential.
 async function triggerGitHubWorkflow(csvString, filename, batch) {
   if (!ghConfigured) return { ok: false, status: 'not_configured' };
 
   const payload = {
-    event_type: 'ux-session-submitted',
-    client_payload: {
-      filename: filename,
-      folder: GH.folder,
-      branch: GH.branch,
-      csv: csvString
-    }
+    filename: filename,
+    folder: GH.folder,
+    branch: GH.branch,
+    csv: csvString,
+    batch: batch
   };
 
-  const url = `https://api.github.com/repos/${GH.owner}/${GH.dataRepo}/dispatches`;
-
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + GH.token
-    },
-    body: JSON.stringify(payload)
-  });
+  let resp;
+  try {
+    resp = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) {
+    // Network-level failure (Worker unreachable, CORS, offline, etc.)
+    return { ok: false, status: 'network_error' };
+  }
 
   const isSuccess = resp.status >= 200 && resp.status <= 204;
   return { ok: isSuccess, status: resp.status };
