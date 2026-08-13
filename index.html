@@ -421,7 +421,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b1-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
+    <textarea class="notes-area" id="b1-notes" ></textarea>
   </div>
 
   <div class="gh-status-bar" id="b1-gh-status"></div>
@@ -498,7 +498,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b2-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
+    <textarea class="notes-area" id="b2-notes" ></textarea>
   </div>
 
   <div class="gh-status-bar" id="b2-gh-status"></div>
@@ -576,7 +576,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b3-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
+    <textarea class="notes-area" id="b3-notes" ></textarea>
   </div>
 
   <div class="gh-status-bar" id="b3-gh-status"></div>
@@ -659,7 +659,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b4-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
+    <textarea class="notes-area" id="b4-notes" ></textarea>
   </div>
 
   <div class="gh-status-bar" id="b4-gh-status"></div>
@@ -851,7 +851,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b6-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
+    <textarea class="notes-area" id="b6-notes" ></textarea>
   </div>
 
   <div class="gh-status-bar" id="b6-gh-status"></div>
@@ -957,7 +957,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b7-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
+    <textarea class="notes-area" id="b7-notes" ></textarea>
   </div>
 
   <div class="gh-status-bar" id="b7-gh-status"></div>
@@ -1077,7 +1077,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts? <span class="q-select-hint">(Select all that apply)</span></div>
     <div class="q-sub">Any additional thoughts or feedback — any reactions, hesitations, or suggestions worth noting.</div>
-    <textarea class="notes-area" id="b8-notes" placeholder="e.g. 'Participant laughed and said they had no idea…' or 'Parent or Guardian disagreed with their child's answer'…"></textarea>
+    <textarea class="notes-area" id="b8-notes" ></textarea>
   </div>
 
   <div class="gh-status-bar" id="b8-gh-status"></div>
@@ -1381,7 +1381,7 @@ function esc(s) {
 
 
 // ══ GitHub config (in-memory only, cleared on page close) ════════════════
-let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main', token: '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' };
+let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main', token: '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' };
 let ghConfigured = true;
 
 
@@ -1421,7 +1421,8 @@ async function triggerGitHubWorkflow(csvString, filename, batch) {
     body: JSON.stringify(payload)
   });
 
-  return { ok: resp.ok || resp.status === 204, status: resp.status };
+  const isSuccess = resp.status >= 200 && resp.status <= 204;
+  return { ok: isSuccess, status: resp.status };
 }
 
 function toggleNeitherField(btn) {
