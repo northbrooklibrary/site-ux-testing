@@ -1381,7 +1381,7 @@ function esc(s) {
 
 
 // ══ GitHub config (in-memory only, cleared on page close) ════════════════
-let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main' };
+let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main', token: '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' };
 let ghConfigured = true;
 
 
@@ -1415,7 +1415,8 @@ async function triggerGitHubWorkflow(csvString, filename, batch) {
     headers: {
       'Accept': 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + GH.token
     },
     body: JSON.stringify(payload)
   });
