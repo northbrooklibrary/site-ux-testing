@@ -453,7 +453,7 @@
     <div class="assoc-term">Local Government &amp; Services</div>
     <div class="assoc-prompt">If you visited the library's "Local Government &amp; Services" web page, what words or topics would you expect to find? Type each one and press Add (or Enter).</div>
     <div class="tag-input-row">
-      <input class="tag-input" id="b2-word-input" type="text" placeholder="e.g. mayor, permits, bus routes…" onkeydown="if(event.key==='Enter'){addTag('b2')}">
+      <input class="tag-input" id="b2-word-input" type="text" onkeydown="if(event.key==='Enter'){addTag('b2')}">
       <button class="add-btn" onclick="addTag('b2')">Add</button>
     </div>
     <div class="tag-cloud" id="b2-cloud"></div>
@@ -530,7 +530,7 @@
 
   <div class="q-block">
     <div class="q-label">Q1 — What section label would you look for? <span class="q-select-hint">(Choose one)</span></div>
-    <textarea class="notes-area" id="b3-unprompted" placeholder="Participant's exact words…" style="min-height:46px"></textarea>
+    <textarea class="notes-area" id="b3-unprompted" style="min-height:46px"></textarea>
   </div>
 
   <div class="q-block">
@@ -726,7 +726,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback.</div>
-    <textarea class="notes-area" id="b5-notes" placeholder="e.g. 'Participant laughed and said they had no idea…'"></textarea>
+    <textarea class="notes-area" id="b5-notes"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b5-gh-status"></div>
@@ -777,7 +777,7 @@
   <div class="q-block">
     <div class="q-label">Any other thoughts?</div>
     <div class="q-sub">Any additional thoughts or feedback.</div>
-    <textarea class="notes-area" id="b5b-notes" placeholder="e.g. 'Participant preferred Personal Development &amp; Wellness…'"></textarea>
+    <textarea class="notes-area" id="b5b-notes"></textarea>
   </div>
 
   <div class="gh-status-bar" id="b5b-gh-status"></div>
@@ -807,7 +807,7 @@
 
   <div class="q-block">
     <div class="q-label">Q1 — Unprompted: What section would you use to find books for a 15-year-old? <span class="q-select-hint">(Choose one)</span></div>
-    <textarea class="notes-area" id="b6-unprompted" placeholder="Participant's exact words before seeing the two terms…" style="min-height:46px"></textarea>
+    <textarea class="notes-area" id="b6-unprompted" style="min-height:46px"></textarea>
   </div>
   <div class="q-block">
     <div class="q-label">Q2 — Which label feels right for ages 13–18?</div>
@@ -819,7 +819,7 @@
     </div>
     <div id="b6q2-other-wrap" style="margin-top:10px;display:none;">
       <label style="font-size:.88rem;font-weight:700;color:#2d2d2d;display:block;margin-bottom:4px;">What word would you use instead?</label>
-      <input type="text" id="b6q2-other" class="tag-input" placeholder="Participant's suggested term…" style="width:100%;max-width:380px;" />
+      <input type="text" id="b6q2-other" class="tag-input" style="width:100%;max-width:380px;" />
     </div>
   </div>
   <div class="q-block">
@@ -876,7 +876,7 @@
     <label>Date <input type="date" id="b7-date" /></label>
     
     <label>Age group <select id="b7-age"><option value="">—</option><option>Child (under 12)</option><option>Teen (13–17)</option><option>Adult (18–64)</option><option>Senior (65+)</option></select></label>
-    <label>Child's age (if caregiver) <input type="text" id="b7-childage" placeholder="e.g. 7" style="width:80px" /></label>
+    <label>Child's age (if caregiver) <input type="text" id="b7-childage" style="width:80px" /></label>
     
   </div>
 
@@ -1381,7 +1381,7 @@ function esc(s) {
 
 
 // ══ GitHub config (in-memory only, cleared on page close) ════════════════
-let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main', token: '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' };
+let GH = { owner: 'northbrooklibrary', dataRepo: 'site-ux-data', folder: 'data', branch: 'main', token: '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' };
 let ghConfigured = true;
 
 
