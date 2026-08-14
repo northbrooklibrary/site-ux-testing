@@ -1161,7 +1161,7 @@ function dropTerm(e, zoneId) {
 
 // ══ In-memory session store ════════════════════════════════════
 // sessions[batch] = [ { ...row }, ... ]
-const sessions = { b1:[], b2:[], b3:[], b4:[], b5:[], b6:[], b7:[], b8:[] };
+const sessions = { b1:[], b2:[], b3:[], b4:[], b5:[], b5b:[], b6:[], b7:[], b8:[] };
 
 // ══ Collect all responses for a batch into a flat object ═══════
 function collectResponses(batch) {
@@ -1182,6 +1182,7 @@ function collectResponses(batch) {
     b3: ['b3q2','b3q3','b3q4','b3q5'],
     b4: ['b4q2','b4q3'],
     b5: ['b5q2a','b5q3b','b5q4b'],
+    b5b: ['b5bq1','b5bq2'],
     b6: ['b6q2','b6q3','b6q4','b6q5'],
     b7: ['b7q1','b7q2','b7q3','b7q4'],
     b8: ['b8q2','b8q4','b8q5']
